@@ -168,7 +168,7 @@ const LoginPage = () => {
             <StyledForm onSubmit={signupUser}>
               <div className='form-control'>
                 <label className='form-label' htmlFor='signUpName'>
-                  Name
+                  Team Name
                 </label>
                 <input
                   className='form-input'
@@ -194,7 +194,7 @@ const LoginPage = () => {
               </div>
               <div className='form-control'>
                 <label className='form-label' htmlFor='signUpImage'>
-                  Image
+                  Team Logo
                 </label>
                 <input
                   className='form-input'

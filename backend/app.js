@@ -30,18 +30,39 @@ mongoose
 // ROUTES
 // GET: test
 app.get('/', (req, res) => res.send('API is running...'));
-// GET: all teams with votes
-app.get('/teams', async (req, res) => {
-  let teams = await Team.find({});
-  let votes = await Vote.find({});
-  let teamsWithScore = teams.reduce((total, team) => {
-    let teamVotesObj = votes.find((vote) => vote.team_id === '' + team._id);
-    total.push({ ...team.toObject(), score: teamVotesObj.votes });
-    return total;
-  }, []);
+// GET: check if id exists return all teams with votes
+app.get('/teams/:id', async (req, res) => {
+  let id = req.params.id;
+  const found = await Team.findOne({ _id: id }).select('_id').lean();
+  if (found) {
+    let teams = await Team.find({});
+    let votes = await Vote.find({});
+    let teamsWithScore = teams.reduce((total, team) => {
+      let teamVotesObj = votes.find((vote) => vote.team_id === '' + team._id);
+      total.push({ ...team.toObject(), score: teamVotesObj.votes });
+      return total;
+    }, []);
 
-  res.json(teamsWithScore);
+    res.json(teamsWithScore);
+  } else {
+    res.status(401).json({
+      loginStatus: 'failed',
+      message: 'Team not found',
+    });
+  }
 });
+// // GET: all teams with votes
+// app.get('/teams', async (req, res) => {
+//   let teams = await Team.find({});
+//   let votes = await Vote.find({});
+//   let teamsWithScore = teams.reduce((total, team) => {
+//     let teamVotesObj = votes.find((vote) => vote.team_id === '' + team._id);
+//     total.push({ ...team.toObject(), score: teamVotesObj.votes });
+//     return total;
+//   }, []);
+
+//   res.json(teamsWithScore);
+// });
 // POST: Login existing team
 app.post('/login', async (req, res) => {
   const teams = await Team.find();
@@ -90,8 +111,6 @@ app.post('/signup', async (req, res) => {
   }
 });
 // POST: update vote and team.voted_by
-// this is by no means efficient
-// could get current values from front end? or maybe find all filter and update without using findONEandupdate method
 app.post('/vote', async (req, res) => {
   if (!req.body.itemId || !req.body.votingTeam || !req.body.num)
     return res.status(400).json({ message: 'missing user input' });
@@ -122,3 +141,12 @@ app.post('/vote', async (req, res) => {
 // const updatedTeam = await Team.findOneAndUpdate(teamFilter, updateVoted, {
 //   new: true,
 // });
+
+// Warning! this route clears the db
+app.get('/clear', async (req, res) => {
+  const teamsDeleted = await Team.deleteMany({});
+  const votesDelted = await Vote.deleteMany({});
+
+  console.log('Teams', teamsDeleted);
+  console.log('Votes', votesDelted);
+});

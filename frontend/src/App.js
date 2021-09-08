@@ -26,7 +26,7 @@ function App() {
       <UserContext.Provider value={{ userIdState, setUserIdState }}>
         <Router>
           <Switch>
-            <Route path='/login' component={LoginPage} />
+            <Route exact path='/' component={LoginPage} />
             <Route path='/teams' component={ProtectedRoute} />
           </Switch>
         </Router>

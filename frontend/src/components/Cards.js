@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { UserContext } from '../App';
 import { Button } from './Button';
 import styled from 'styled-components';
+
 const StyledCards = styled.div`
   margin-top: 30px;
   display: grid;
@@ -25,7 +26,7 @@ const StyledCard = styled.div`
   justify-content: flex-end;
 
   img {
-    width: 100%;
+    width: 80%;
   }
   .buttons {
     width: 100%;

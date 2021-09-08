@@ -19,6 +19,8 @@ const TeamsPage = () => {
   // hooks
   // state
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   //   context
   const { setUserIdState } = useContext(UserContext);
   // --- redirects
@@ -27,21 +29,24 @@ const TeamsPage = () => {
   useEffect(() => {
     let isMounted = true;
     const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          'https://react-testas.herokuapp.com/teams'
-        );
-        if (isMounted);
-        setData(response.data);
-      } catch (error) {
-        console.log(error);
+      const response = await axios.get(
+        `http://localhost:5000/teams/${localStorage.getItem('user')}`
+      );
+      console.log(response);
+      if (isMounted);
+      if (response.data.message === 'failed') {
+        alert('ups smth is wrong with you identification');
+        history.push('/');
       }
+      setData(response.data);
+      setLoading(false);
     };
     fetchData();
+
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [history]);
   // custom functions
   //   voting functions updates state and sends post request to the server
   const vote = (votingTeam, itemId, num) => {
@@ -68,12 +73,16 @@ const TeamsPage = () => {
     localStorage.removeItem('user');
     setUserIdState('');
     setData('');
-    history.push('/login');
+    history.push('/');
   };
 
   return (
     <>
-      {data ? (
+      {loading ? (
+        <StyledTeamsMain>
+          <h2>...Loading...</h2>
+        </StyledTeamsMain>
+      ) : (
         <StyledTeamsMain>
           <Button logout onClick={logoutHandler}>
             Logout
@@ -81,8 +90,6 @@ const TeamsPage = () => {
 
           <Cards data={data} vote={vote} />
         </StyledTeamsMain>
-      ) : (
-        <h2>...Loading...</h2>
       )}
     </>
   );
