@@ -6,31 +6,13 @@ import { useHistory } from 'react-router-dom';
 import TeamsPage from './pages/TeamsPage';
 
 const ProtectedRoute = () => {
-  // Hooks
-  // -- context
-  // const { userState, setUserState } = useContext(UserContext);
-  // -- redirects
   const history = useHistory();
-
-  // ref for variable used in useEffect
-  //   const userId = useRef(localStorage.getItem('user'));
-  //   const dataExists = useRef(userState);
-  // -- side effects
+  // simple validation using local storage
   useEffect(() => {
     if (!localStorage.getItem('user')) {
       history.push('/login');
     }
-    // if (!dataExists.current) {
-    //   axios
-    //     .get(
-    //       `https://car-adverts-react.herokuapp.com/api/users/${userId.current}`
-    //     )
-    //     .then((res) => {
-    //         setUserState(res.data);
-    //       console.log('fetche');
-    //     })
-    //     .catch((err) => console.log('err', err));
-    // }
+
     console.log('protected route effect');
   }, [history]);
 
