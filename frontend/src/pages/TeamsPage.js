@@ -30,7 +30,9 @@ const TeamsPage = () => {
     let isMounted = true;
     const fetchData = async () => {
       const response = await axios.get(
-        `http://localhost:5000/teams/${localStorage.getItem('user')}`
+        `https://react-testas.herokuapp.com/teams/${localStorage.getItem(
+          'user'
+        )}`
       );
       console.log(response);
       if (isMounted);
