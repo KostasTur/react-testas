@@ -34,7 +34,6 @@ const TeamsPage = () => {
           'user'
         )}`
       );
-      console.log(response);
       if (isMounted);
       if (response.data.message === 'failed') {
         alert('ups smth is wrong with you identification');

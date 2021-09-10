@@ -29,23 +29,28 @@ mongoose
 app.get('/', (req, res) => res.send('API is running...'));
 // GET: check if id exists return all teams with votes
 app.get('/teams/:id', async (req, res) => {
-  let id = req.params.id;
-  const found = await Team.findOne({ _id: id }).select('_id').lean();
-  if (found) {
-    let teams = await Team.find({});
-    let votes = await Vote.find({});
-    let teamsWithScore = teams.reduce((total, team) => {
-      let teamVotesObj = votes.find((vote) => vote.team_id === '' + team._id);
-      total.push({ ...team.toObject(), score: teamVotesObj.votes });
-      return total;
-    }, []);
+  try {
+    let id = req.params.id;
+    const found = await Team.findOne({ _id: id }).select('_id').lean();
+    if (found) {
+      let teams = await Team.find({}, { password: 0, email: 0 });
+      console.log(teams);
+      let votes = await Vote.find({});
+      let teamsWithScore = teams.reduce((total, team) => {
+        let teamVotesObj = votes.find((vote) => vote.team_id === '' + team._id);
+        total.push({ ...team.toObject(), score: teamVotesObj.votes });
+        return total;
+      }, []);
 
-    res.json(teamsWithScore);
-  } else {
-    res.status(401).json({
-      loginStatus: 'failed',
-      message: 'Team not found',
-    });
+      res.json(teamsWithScore);
+    } else {
+      res.status(401).json({
+        loginStatus: 'failed',
+        message: 'Team not found',
+      });
+    }
+  } catch (err) {
+    console.log(err);
   }
 });
 // // GET: all teams with votes
@@ -62,24 +67,28 @@ app.get('/teams/:id', async (req, res) => {
 // });
 // POST: Login existing team
 app.post('/login', async (req, res) => {
-  const teams = await Team.find();
-  let teamFound = teams.find(
-    (team) =>
-      team.email === req.body.email && team.password === req.body.password
-  );
+  try {
+    const teams = await Team.find();
+    let teamFound = teams.find(
+      (team) =>
+        team.email === req.body.email && team.password === req.body.password
+    );
 
-  if (teamFound) {
-    let { _id, email } = teamFound;
-    res.json({
-      loginStatus: 'success',
-      team_id: _id,
-      email: email,
-    });
-  } else {
-    res.status(401).json({
-      loginStatus: 'failed',
-      message: 'Given email or password is incorrect',
-    });
+    if (teamFound) {
+      let { _id, email } = teamFound;
+      res.json({
+        loginStatus: 'success',
+        team_id: _id,
+        email: email,
+      });
+    } else {
+      res.status(401).json({
+        loginStatus: 'failed',
+        message: 'Given email or password is incorrect',
+      });
+    }
+  } catch (err) {
+    console.log(err);
   }
 });
 // POST: add team to database
@@ -109,10 +118,10 @@ app.post('/signup', async (req, res) => {
 });
 // POST: update vote and team.voted_by
 app.post('/vote', async (req, res) => {
-  if (!req.body.itemId || !req.body.votingTeam || !req.body.num)
-    return res.status(400).json({ message: 'missing user input' });
-
   try {
+    if (!req.body.itemId || !req.body.votingTeam || !req.body.num)
+      return res.status(400).json({ message: 'missing user input' });
+
     const teamFilter = { _id: req.body.itemId };
     const voteFilter = { team_id: req.body.itemId };
 
